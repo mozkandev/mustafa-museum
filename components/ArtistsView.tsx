@@ -108,6 +108,16 @@ function ArtistsGridFallback({ artists, onPick }: { artists: any[]; onPick: (a: 
 }
 
 export default function ArtistsView({ period }: { period: any }) {
+  if (!period) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#0a0a14] text-white">
+        <div className="text-center">
+          <p className="text-amber-200/60 mb-3">No period selected.</p>
+          <button onClick={() => window.location.href = "/"} className="text-amber-200 underline">← back to timeline</button>
+        </div>
+      </div>
+    );
+  }
   const [artists, setArtists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [webglOk, setWebglOk] = useState(true);

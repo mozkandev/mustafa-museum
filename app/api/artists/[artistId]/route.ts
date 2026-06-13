@@ -14,5 +14,5 @@ export async function GET(_req: any, { params }: any) {
   const artist = findArtist(artistId);
   if (!artist) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const works = getWorksForArtist(artistId);
-  return NextResponse.json({ ...artist, works });
+  return NextResponse.json({ artist, works });
 }
