@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { PointerLockControls, useTexture, Environment, Text, SpotLight } from "@react-three/drei";
+import { PointerLockControls, Environment, Text, SpotLight } from "@react-three/drei";
 import { EffectComposer, Bloom, ToneMapping, Vignette, SMAA } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
 import * as THREE from "three";
@@ -39,16 +39,37 @@ function WalkControls() {
 }
 
 function Painting({ work, position, rotation, onClick }: any) {
-  const tex: any = useTexture(work.thumbUrl || work.imageUrl);
+  const [tex, setTex] = useState<any>(null);
+  const [texError, setTexError] = useState(false);
   const frameRef = useRef<any>(null);
   const [hovered, setHovered] = useState(false);
 
+  // Manual texture load (no Suspense, with timeout)
   useEffect(() => {
-    if (tex) {
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = 16;
-    }
-  }, [tex]);
+    const loader = new THREE.TextureLoader();
+    let cancelled = false;
+    const url = work.thumbUrl || work.imageUrl;
+    const timeout = setTimeout(() => {
+      if (!cancelled) setTexError(true);
+    }, 8000);
+    loader.load(
+      url,
+      (t) => {
+        if (cancelled) return;
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = 16;
+        setTex(t);
+      },
+      undefined,
+      () => {
+        if (!cancelled) setTexError(true);
+      }
+    );
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [work.thumbUrl, work.imageUrl]);
 
   useEffect(() => {
     if (hovered && frameRef.current) {
@@ -77,7 +98,11 @@ function Painting({ work, position, rotation, onClick }: any) {
       {/* Canvas */}
       <mesh position={[0, 0, 0.085]}>
         <planeGeometry args={[w, h]} />
-        <meshStandardMaterial map={tex} roughness={0.7} metalness={0} toneMapped={true} />
+        {tex ? (
+          <meshStandardMaterial map={tex} roughness={0.7} metalness={0} toneMapped={true} />
+        ) : (
+          <meshStandardMaterial color={texError ? "#1a1a2e" : "#2a2a3e"} roughness={0.7} metalness={0} />
+        )}
       </mesh>
       {/* Title plaque */}
       <mesh position={[0, -h/2 - 0.2, 0.05]}>
