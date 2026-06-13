@@ -12,7 +12,7 @@ export default function Timeline({ periods }) {
   const animFrame = useRef(null);
   const targetScale = useRef(0.06);
   const targetOffset = useRef(0);
-  const selectPeriod = useStore((s) => s.selectPeriod);
+  const selectPeriod = useStore((s: any) => s.selectPeriod);
 
   useEffect(() => {
     const update = () => setVw(window.innerWidth);

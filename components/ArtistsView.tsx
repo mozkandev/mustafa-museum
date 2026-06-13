@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Text, RoundedBox, useTexture, Environment, ContactShadows, Float } from "@react-three/drei";
 import { useStore } from "@/lib/store";
@@ -64,8 +64,8 @@ function ArtistCard({ artist, position, index, onClick }: { artist: any; positio
 export default function ArtistsView({ period }: { period: any }) {
   const [artists, setArtists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const selectArtist = useStore((s) => s.selectArtist);
-  const backToTimeline = useStore((s) => s.goHome);
+  const selectArtist = useStore((s: any) => s.selectArtist);
+  const backToTimeline = useStore((s: any) => s.goHome);
 
   useEffect(() => {
     fetch(`/api/periods/${period.id}/artists`)
@@ -87,6 +87,7 @@ export default function ArtistsView({ period }: { period: any }) {
 
       {/* 3D canvas */}
       <Canvas camera={{ position: [0, 0, 8], fov: 50 }} dpr={[1, 2]} shadows>
+        <Suspense fallback={<Text position={[0, 0, 0]} fontSize={0.4} color="#a8a29e" anchorX="center">Loading…</Text>}>
         <color attach="background" args={["#0a0a14"]} />
         <fog attach="fog" args={["#0a0a14", 10, 25]} />
         <ambientLight intensity={0.4} />
@@ -111,6 +112,7 @@ export default function ArtistsView({ period }: { period: any }) {
         )}
 
         <ContactShadows position={[0, -3, 0]} opacity={0.4} scale={20} blur={2} far={4} />
+        </Suspense>
       </Canvas>
     </div>
   );

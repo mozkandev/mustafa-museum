@@ -227,7 +227,7 @@ function Placard({ work, position, rotation }) {
 
 export default function GalleryView({ artist, works }) {
   const [selectedWork, setSelectedWork] = useState(null);
-  const backToArtists = useStore(s => s.backToArtists);
+  const backToArtists = useStore((s: any) => s.backToArtists);
   const [clicked, setClicked] = useState(false);
 
   return (
