@@ -1,0 +1,49 @@
+// Prisma schema for the art museum
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Period {
+  id        String    @id
+  name      String
+  startYear Int
+  endYear   Int
+  region    String
+  summary   String
+  artists   Artist[]
+}
+
+model Artist {
+  id          String    @id
+  name        String
+  birthYear   Int
+  deathYear   Int?
+  periodId    String
+  period      Period    @relation(fields: [periodId], references: [id])
+  nationality String
+  summary     String
+  movements   String
+  works       Work[]
+  portrait    String?
+}
+
+model Work {
+  id          String  @id
+  title       String
+  artistId    String
+  artist      Artist  @relation(fields: [artistId], references: [id])
+  year        Int?
+  imageUrl    String
+  thumbUrl    String
+  medium      String?
+  style       String?
+  width       Int?
+  height      Int?
+  description String?
+}
